@@ -1,5 +1,5 @@
-import {EXAMPLELanguage} from "../dist/index.js"
-import {fileTests} from "@lezer/generator/dist/test"
+import { IndigoLanguage } from "../dist/index.js"
+import { fileTests } from "@lezer/generator/dist/test"
 
 import * as fs from "fs"
 import * as path from "path"
@@ -11,7 +11,7 @@ for (let file of fs.readdirSync(caseDir)) {
 
   let name = /^[^\.]*/.exec(file)[0]
   describe(name, () => {
-    for (let {name, run} of fileTests(fs.readFileSync(path.join(caseDir, file), "utf8"), file))
-      it(name, () => run(EXAMPLELanguage.parser))
+    for (let { name, run } of fileTests(fs.readFileSync(path.join(caseDir, file), "utf8"), file))
+      it(name, () => run(IndigoLanguage.parser))
   })
 }

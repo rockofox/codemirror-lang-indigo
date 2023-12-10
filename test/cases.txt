@@ -1,7 +1,7 @@
 # Booleans
 
-#t
-#f
+True
+False
 
 ==>
 
@@ -27,15 +27,66 @@ Program(String, String)
 
 # Applications
 
-(begin
-  (when #t
-    (print (concat "hello" " " "world")))
-  (print "DONE"))
+println "Hello World"
 
 ==>
 
-Program(Application(
-  Identifier,
-  Application(Identifier, Boolean, Application(
-    Identifier, Application(Identifier, String, String, String)))
-  Application(Identifier, String)))
+Program(Identifier,String)
+
+# Boolean operators
+
+True && False
+
+==>
+
+Program(BinaryOperation(LValue(Boolean),BooleanOperator,RValue(Boolean)))
+
+# Comparison operator
+
+1 == 1
+
+==>
+
+Program(BinaryOperation(LValue(Number),ComparisonOperator,RValue(Number)))
+
+# Arithmetic operator
+
+2 + 3
+
+==>
+
+Program(BinaryOperation(LValue(Number),ArithmeticOperator,RValue(Number)))
+
+# Simple definiton
+
+let abc = 123
+
+==>
+
+Program(Definition(let,LValue(Identifier),AssignmentOperator,RValue(Number)))
+
+# Definiton with parameters
+
+let mul (x: Int, y: Int) = x * y
+
+==>
+
+Program(Definition(let,LValue(Identifier),ParameterSection("(",Parameter(Identifier,Identifier),Parameter(Identifier,Identifier),")"),AssignmentOperator,RValue(BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(Identifier)))))
+
+# Definiton with parameters and return value
+
+let mul (x: Int, y: Int) => Int = x * y
+
+==>
+
+Program(Definition(let,LValue(Identifier),ParameterSection("(",Parameter(Identifier,Identifier),Parameter(Identifier,Identifier),")"),ReturnValue(Identifier),AssignmentOperator,RValue(BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(Identifier)))))
+
+# Hello World
+
+let main = do
+  println "Hello World"
+end
+
+==>
+
+Program(Definition(let,LValue(Identifier),AssignmentOperator,RValue(DoBlock(do,Identifier,String,end))))

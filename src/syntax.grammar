@@ -2,25 +2,71 @@
 
 @skip { space | LineComment }
 
+commaSep<content> { "" | content ("," content)* }
+kw<term> { @specialize[@name={term}]<Identifier, term> }
+
 expression {
   Identifier |
   String |
   Boolean |
-  Application { "(" expression* ")" }
+  Number |
+  DoBlock |
+  Definition {
+    kw<"let"> LValue ParameterSection? ReturnValue? AssignmentOperator RValue
+  } |
+  BinaryOperation {
+    LValue
+    (ArithmeticOperator | ComparisonOperator | BooleanOperator | AssignmentOperator)
+    RValue
+  }
+}
+
+ReturnValue {
+  "=>" Identifier
+}
+
+ParameterSection {
+  "(" commaSep<Parameter> ")"
+}
+
+Parameter {
+  Identifier ":" Identifier
+}
+
+LValue {
+  Identifier | String | Boolean | Number
+}
+
+RValue {
+  expression
+}
+DoBlock {
+  kw<"do"> expression* kw<"end">
+}
+
+@local tokens {
+  blockCommentEnd { "*/" }
+  blockCommentNewline { "\n" }
+  @else blockCommentContent
 }
 
 @tokens {
-  Identifier { $[a-zA-Z_\-0-9]+ }
-
+  identifierChar { @asciiLetter | $[_$\u{a1}-\u{10ffff}] }
+  word { identifierChar (identifierChar | @digit)* }
+  Identifier { word }
   String { '"' (!["\\] | "\\" _)* '"' }
-
-  Boolean { "#t" | "#f" }
-
-  LineComment { ";" ![\n]* }
-
+  Boolean { "True" | "False" }
+  LineComment { "#" ![\n]* }
+  BlockComment { "/*" (blockCommentContent | blockCommentNewline)* blockCommentEnd }
+  AssignmentOperator { "=" }
+  ArithmeticOperator { "+" | "-" | "*" | "/" | "%" }
+  ComparisonOperator { "==" | "!=" | "<" | "<=" | ">" | ">=" }
+  BooleanOperator { "&&" | "||" }
+  Number { $[0-9]+ }
   space { $[ \t\n\r]+ }
 
   "(" ")"
+  @precedence { ArithmeticOperator, ComparisonOperator, BooleanOperator, AssignmentOperator, Boolean, Identifier }
 }
 
 @detectDelim
