@@ -13,6 +13,7 @@ expression {
   Number |
   DoBlock |
   ParameterSection |
+  Cast |
   Definition {
     kw<"let"> LValue ParameterSection? ReturnValue? AssignmentOperator RValue
   } |
@@ -28,7 +29,7 @@ expression {
 }
 
 ReturnValue {
-  "=>" Identifier
+  "=>" Type
 }
 
 ParameterSection {
@@ -68,6 +69,10 @@ Trait {
 
 HaskellStyle {
   Identifier "::" arrowSep<Identifier> // AssignmentOperator expression
+}
+
+Cast {
+  LValue kw<"as"> Type
 }
 
 @local tokens {

@@ -71,7 +71,7 @@ let mul (x: Int, y: Int) = x * y
 
 ==>
 
-Program(Definition(let,LValue(Identifier),ParameterSection("(",Parameter(Identifier,Identifier),Parameter(Identifier,Identifier),")"),AssignmentOperator,RValue(BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(Identifier)))))
+Program(Definition(let,LValue(Identifier),ParameterSection("(",Parameter(Identifier,Type(Identifier)),Parameter(Identifier,Type(Identifier)),")"),AssignmentOperator,RValue(BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(Identifier)))))
 
 # Definiton with parameters and return value
 
@@ -79,7 +79,7 @@ let mul (x: Int, y: Int) => Int = x * y
 
 ==>
 
-Program(Definition(let,LValue(Identifier),ParameterSection("(",Parameter(Identifier,Identifier),Parameter(Identifier,Identifier),")"),ReturnValue(Identifier),AssignmentOperator,RValue(BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(Identifier)))))
+Program(Definition(let,LValue(Identifier),ParameterSection("(",Parameter(Identifier,Type(Identifier)),Parameter(Identifier,Type(Identifier)),")"),ReturnValue(Type(Identifier)),AssignmentOperator,RValue(BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(Identifier)))))
 
 # Hello World
 
@@ -109,7 +109,7 @@ struct Person = (name: String)
 
 ==>
 
-Program(Struct(struct,Identifier,AssignmentOperator,ParameterSection("(",Parameter(Identifier,Identifier),")")))
+Program(Struct(struct,Identifier,AssignmentOperator,ParameterSection("(",Parameter(Identifier,Type(Identifier)),")")))
 
 # Trait
 
@@ -120,3 +120,11 @@ end
 ==>
 
 Program(Trait(trait,Identifier,AssignmentOperator,DoBlock(do,HaskellStyle(Identifier,Identifier,Identifier),end)))
+
+# Cast
+
+12 as String
+
+==>
+
+Program(Cast(LValue(Number),as,Type(Identifier)))
