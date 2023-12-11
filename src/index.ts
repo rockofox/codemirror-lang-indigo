@@ -22,7 +22,7 @@ export const IndigoLanguage = LRLanguage.define({
         ArithmeticOperator: t.arithmeticOperator,
         ComparisonOperator: t.compareOperator,
         BooleanOperator: t.logicOperator,
-        "Definition/LValue": t.variableName,
+        "Definition/LValue": t.definition(t.variableName),
         Number: t.number,
         "( )": t.paren,
         ...(Object.fromEntries(keywords.map(kw => [kw, t.keyword])))

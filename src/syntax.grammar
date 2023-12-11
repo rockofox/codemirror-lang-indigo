@@ -3,6 +3,7 @@
 @skip { space | LineComment }
 
 commaSep<content> { "" | content ("," content)* }
+arrowSep<content> { content ("->" content)* }
 kw<term> { @specialize[@name={term}]<Identifier, term> }
 
 expression {
@@ -11,9 +12,14 @@ expression {
   Boolean |
   Number |
   DoBlock |
+  ParameterSection |
   Definition {
     kw<"let"> LValue ParameterSection? ReturnValue? AssignmentOperator RValue
   } |
+  If |
+  Struct |
+  Trait |
+  HaskellStyle |
   BinaryOperation {
     LValue
     (ArithmeticOperator | ComparisonOperator | BooleanOperator | AssignmentOperator)
@@ -29,8 +35,12 @@ ParameterSection {
   "(" commaSep<Parameter> ")"
 }
 
+Type {
+  Identifier
+}
+
 Parameter {
-  Identifier ":" Identifier
+  Identifier ":" Type
 }
 
 LValue {
@@ -42,6 +52,22 @@ RValue {
 }
 DoBlock {
   kw<"do"> expression* kw<"end">
+}
+
+If {
+  kw<"if"> expression kw<"then"> expression kw<"else"> expression kw<"end">
+}
+
+Struct {
+  kw<"struct"> Identifier AssignmentOperator expression
+}
+
+Trait {
+  kw<"trait"> Identifier AssignmentOperator expression
+}
+
+HaskellStyle {
+  Identifier "::" arrowSep<Identifier> // AssignmentOperator expression
 }
 
 @local tokens {

@@ -90,3 +90,33 @@ end
 ==>
 
 Program(Definition(let,LValue(Identifier),AssignmentOperator,RValue(DoBlock(do,Identifier,String,end))))
+
+# If
+
+if a == b then
+  1
+else
+  2
+end
+
+==>
+
+Program(If(if,BinaryOperation(LValue(Identifier),ComparisonOperator,RValue(Identifier)),then,Number,else,Number,end))
+
+# Struct
+
+struct Person = (name: String)
+
+==>
+
+Program(Struct(struct,Identifier,AssignmentOperator,ParameterSection("(",Parameter(Identifier,Identifier),")")))
+
+# Trait
+
+trait Show = do
+  show :: Self -> String
+end
+
+==>
+
+Program(Trait(trait,Identifier,AssignmentOperator,DoBlock(do,HaskellStyle(Identifier,Identifier,Identifier),end)))
