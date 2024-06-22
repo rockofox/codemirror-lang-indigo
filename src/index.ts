@@ -1,6 +1,6 @@
-import {parser} from "./syntax.grammar"
-import {LRLanguage, LanguageSupport, indentNodeProp, foldNodeProp, foldInside, delimitedIndent} from "@codemirror/language"
-import {styleTags, tags as t} from "@lezer/highlight"
+import { parser } from "./syntax.grammar"
+import { LRLanguage, LanguageSupport, indentNodeProp, foldNodeProp, foldInside, delimitedIndent } from "@codemirror/language"
+import { styleTags, tags as t } from "@lezer/highlight"
 
 const keywords = ["let", "as", "qualified", "if", "then", "else", "do", "end", "import", "struct", "trait", "for", "impl"];
 
@@ -8,7 +8,7 @@ export const IndigoLanguage = LRLanguage.define({
   parser: parser.configure({
     props: [
       indentNodeProp.add({
-        Application: delimitedIndent({closing: ")", align: false})
+        Application: delimitedIndent({ closing: ")", align: false })
       }),
       foldNodeProp.add({
         Application: foldInside
@@ -31,7 +31,7 @@ export const IndigoLanguage = LRLanguage.define({
     ]
   }),
   languageData: {
-    commentTokens: {line: "#", block: {open: "/*", close: "*/"}},
+    commentTokens: { line: "#", block: { open: "/*", close: "*/" } },
   }
 })
 

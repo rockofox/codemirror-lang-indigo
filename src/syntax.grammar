@@ -20,6 +20,7 @@ expression {
   If |
   Struct |
   Trait |
+  Impl |
   HaskellStyle |
   BinaryOperation {
     LValue
@@ -65,6 +66,10 @@ Struct {
 
 Trait {
   kw<"trait"> Identifier AssignmentOperator expression
+}
+
+Impl {
+  kw<"impl"> Identifier kw<"for"> Identifier AssignmentOperator expression
 }
 
 HaskellStyle {

@@ -71,7 +71,7 @@ let mul (x: Int, y: Int) = x * y
 
 ==>
 
-Program(Definition(let,LValue(Identifier),ParameterSection("(",Parameter(Identifier,Type(Identifier)),Parameter(Identifier,Type(Identifier)),")"),AssignmentOperator,RValue(BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(Identifier)))))
+<F15>Program(Definition(let,LValue(Identifier),ParameterSection("(",Parameter(Identifier,Type(Identifier)),Parameter(Identifier,Type(Identifier)),")"),AssignmentOperator,RValue(BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(Identifier)))))
 
 # Definiton with parameters and return value
 
@@ -120,6 +120,16 @@ end
 ==>
 
 Program(Trait(trait,Identifier,AssignmentOperator,DoBlock(do,HaskellStyle(Identifier,Identifier,Identifier),end)))
+
+# Impl
+
+impl Show for Person = do
+  show = "Person"
+end
+
+==>
+
+Program(Impl(impl,Identifier,for,Identifier,AssignmentOperator,DoBlock(do,Identifier,String,end)))
 
 # Cast
 
