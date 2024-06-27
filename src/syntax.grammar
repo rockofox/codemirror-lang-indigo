@@ -61,7 +61,7 @@ If {
 }
 
 Struct {
-  kw<"struct"> Identifier AssignmentOperator expression
+  kw<"struct"> Identifier AssignmentOperator expression (kw<"is"> expression)? (kw<"satisfies"> expression)?
 }
 
 Trait {
