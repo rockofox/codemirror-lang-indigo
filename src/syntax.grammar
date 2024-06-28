@@ -3,7 +3,9 @@
 @skip { space | LineComment }
 
 commaSep<content> { "" | content ("," content)* }
+commaSep1<content> { content ("," content)* }
 arrowSep<content> { content ("->" content)* }
+parenthesized<content> { "(" content ")" }
 kw<term> { @specialize[@name={term}]<Identifier, term> }
 
 expression {
@@ -60,8 +62,17 @@ If {
   kw<"if"> expression kw<"then"> expression kw<"else"> expression kw<"end">
 }
 
+@precedence { is @left, satisfies @left }
 Struct {
-  kw<"struct"> Identifier AssignmentOperator expression (kw<"is"> expression)? (kw<"satisfies"> expression)?
+    kw<"struct"> Identifier AssignmentOperator ParameterSection (!is isSection)? (!satisfies satisfiesSection)?
+}
+
+isSection {
+    kw<"is"> Type
+}
+
+satisfiesSection {
+    kw<"satisfies"> parenthesized<expression>
 }
 
 Trait {
