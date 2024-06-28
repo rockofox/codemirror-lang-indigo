@@ -68,7 +68,7 @@ Struct {
 }
 
 isSection {
-    kw<"is"> Type
+    kw<"is"> commaSep1<Type>
 }
 
 satisfiesSection {

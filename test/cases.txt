@@ -151,8 +151,8 @@ Program(Cast(LValue(Number),as,Type(Identifier)))
 
 # Struct is/satisfies
 
-struct Teacher = (name: String) is Person satisfies (it < 4)
+struct Teacher = (name: String) is Person, Employee satisfies (it < 4)
 
 ==>
 
-Program(Struct(struct,Identifier,AssignmentOperator,ParameterSection("(",Parameter(Identifier,Type(Identifier)),")"),is,Type(Identifier),satisfies,"(",BinaryOperation(LValue(Identifier),ComparisonOperator,RValue(Number)),")"))
+Program(Struct(struct,Identifier,AssignmentOperator,ParameterSection("(",Parameter(Identifier,Type(Identifier)),")"),is,Type(Identifier),Type(Identifier),satisfies,"(",BinaryOperation(LValue(Identifier),ComparisonOperator,RValue(Number)),")"))
