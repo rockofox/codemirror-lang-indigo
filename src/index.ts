@@ -2,7 +2,7 @@ import { parser } from "./syntax.grammar"
 import { LRLanguage, LanguageSupport, indentNodeProp, foldNodeProp, foldInside, delimitedIndent } from "@codemirror/language"
 import { styleTags, tags as t } from "@lezer/highlight"
 
-const keywords = ["let", "as", "qualified", "if", "then", "else", "do", "end", "import", "struct", "trait", "for", "impl", "satisfies", "is"];
+const keywords = ["let", "as", "qualified", "if", "then", "else", "do", "end", "import", "struct", "trait", "for", "impl", "satisfies", "is", "when", "of"];
 
 export const IndigoLanguage = LRLanguage.define({
   parser: parser.configure({
@@ -16,6 +16,7 @@ export const IndigoLanguage = LRLanguage.define({
       styleTags({
         Boolean: t.bool,
         String: t.string,
+        CharLiteral: t.string,
         LineComment: t.lineComment,
         BlockComment: t.blockComment,
         AssignmentOperator: t.definitionOperator,

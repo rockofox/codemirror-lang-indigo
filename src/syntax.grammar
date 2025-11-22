@@ -1,6 +1,6 @@
 @top Program { expression* }
 
-@skip { space | LineComment }
+@skip { space | LineComment | BlockComment }
 
 commaSep<content> { "" | content ("," content)* }
 commaSep1<content> { content ("," content)* }
@@ -20,6 +20,7 @@ expression {
     kw<"let"> LValue ParameterSection? ReturnValue? AssignmentOperator RValue
   } |
   If |
+  When |
   Struct |
   Trait |
   Impl |
@@ -62,6 +63,43 @@ If {
   kw<"if"> expression kw<"then"> expression kw<"else"> expression kw<"end">
 }
 
+When {
+  kw<"when"> expression kw<"of"> WhenCase* (kw<"else"> "->" expression)? kw<"end">
+}
+
+WhenCase {
+  Pattern "->" expression
+}
+
+Pattern {
+  EmptyList |
+  SingleElementList |
+  TwoElementList |
+  ConsPattern |
+  CharListPattern |
+  LValue
+}
+
+EmptyList {
+  "[]"
+}
+
+SingleElementList {
+  "[" Identifier "]"
+}
+
+TwoElementList {
+  "[" Identifier "," Identifier "]"
+}
+
+ConsPattern {
+  "(" Identifier (":" Identifier)+ ")"
+}
+
+CharListPattern {
+  "[" commaSep<CharLiteral> "]"
+}
+
 @precedence { is @left, satisfies @left }
 Struct {
     kw<"struct"> Identifier AssignmentOperator ParameterSection (!is isSection)? (!satisfies satisfiesSection)?
@@ -91,20 +129,15 @@ Cast {
   LValue kw<"as"> Type
 }
 
-@local tokens {
-  blockCommentEnd { "*/" }
-  blockCommentNewline { "\n" }
-  @else blockCommentContent
-}
-
 @tokens {
   identifierChar { @asciiLetter | $[_$\u{a1}-\u{10ffff}] }
   word { identifierChar (identifierChar | @digit)* }
   Identifier { word }
   String { '"' (!["\\] | "\\" _)* '"' }
+  CharLiteral { "'" (!['\\] | "\\" _)* "'" }
   Boolean { "True" | "False" }
   LineComment { "#" ![\n]* }
-  BlockComment { "/*" (blockCommentContent | blockCommentNewline)* blockCommentEnd }
+  BlockComment { "/*" (![@*] | "*" ![@/])* "*/" }
   AssignmentOperator { "=" }
   ArithmeticOperator { "+" | "-" | "*" | "/" | "%" }
   ComparisonOperator { "==" | "!=" | "<" | "<=" | ">" | ">=" }
