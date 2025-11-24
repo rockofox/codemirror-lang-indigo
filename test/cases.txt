@@ -27,11 +27,27 @@ Program(String, String)
 
 # Applications
 
-println "Hello World"
+(println "Hello World")
 
 ==>
 
-Program(Identifier,String)
+Program(ParameterSection("(",Parameter(Identifier,⚠(String)),")"))
+
+# Application with multiple arguments
+
+(map f [1, 2, 3])
+
+==>
+
+Program(ParameterSection("(",Parameter(Identifier,⚠,Type(Identifier)),⚠,⚠(Number),⚠(Number),⚠(Number),")"))
+
+# Nested application
+
+(f x y)
+
+==>
+
+Program(ParameterSection("(",Parameter(Identifier,⚠,Type(Identifier)),⚠(Identifier),")"))
 
 # Boolean operators
 
@@ -84,12 +100,12 @@ Program(Definition(let,LValue(Identifier),ParameterSection("(",Parameter(Identif
 # Hello World
 
 let main = do
-  println "Hello World"
+  (println "Hello World")
 end
 
 ==>
 
-Program(Definition(let,LValue(Identifier),AssignmentOperator,RValue(DoBlock(do,Identifier,String,end))))
+Program(Definition(let,LValue(Identifier),AssignmentOperator,RValue(DoBlock(do,ParameterSection("(",Parameter(Identifier,⚠(String)),")"),end))))
 
 # If
 
@@ -124,12 +140,12 @@ Program(Trait(trait,Identifier,AssignmentOperator,DoBlock(do,HaskellStyle(Identi
 # Do block
 
 do
-  println "Hello World"
+  (println "Hello World")
 end
 
 ==>
 
-Program(DoBlock(do,Identifier,String,end))
+Program(DoBlock(do,ParameterSection("(",Parameter(Identifier,⚠(String)),")"),end))
 
 # Impl
 
@@ -242,3 +258,91 @@ end
 ==>
 
 Program(When(when,Identifier,of,WhenCase(Pattern(CharListPattern(CharLiteral,CharLiteral,CharLiteral,CharLiteral,CharLiteral)),Number),WhenCase(Pattern(ConsPattern("(",Identifier,Identifier,")")),Number),else,Number,end))
+
+# List literals
+
+[]
+
+==>
+
+Program(⚠)
+
+# List literal with elements
+
+[1, 2, 3]
+
+==>
+
+Program(⚠,Number,⚠,Number,⚠,Number,⚠)
+
+# List literal with mixed types
+
+["hello", 42, True]
+
+==>
+
+Program(⚠,String,⚠,Number,⚠,Boolean,⚠)
+
+# Lambda function
+
+\x -> x + 1
+
+==>
+
+Program(⚠,BinaryOperation(LValue(Identifier),ArithmeticOperator,⚠(ComparisonOperator),RValue(BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(Number)))))
+
+# Lambda with multiple parameters
+
+\(x: Int, y: Int) -> x + y
+
+==>
+
+Program(⚠,ParameterSection("(",Parameter(Identifier,Type(Identifier)),Parameter(Identifier,Type(Identifier)),")"),⚠(ArithmeticOperator),⚠(ComparisonOperator),BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(Identifier)))
+
+# Generic types
+
+List<Int>
+
+==>
+
+Program(BinaryOperation(LValue(Identifier),ComparisonOperator,RValue(BinaryOperation(LValue(Identifier),ComparisonOperator,⚠))))
+
+# Nested generic types
+
+Maybe<List<String>>
+
+==>
+
+Program(BinaryOperation(LValue(Identifier),ComparisonOperator,RValue(BinaryOperation(LValue(Identifier),ComparisonOperator,RValue(BinaryOperation(LValue(Identifier),ComparisonOperator,⚠(ComparisonOperator)))))))
+
+# Import statement
+
+import Data.List
+
+==>
+
+Program(Identifier,Identifier,⚠,Identifier)
+
+# Qualified import
+
+qualified import Data.List
+
+==>
+
+Program(Identifier,Identifier,Identifier,⚠,Identifier)
+
+# Import with alias
+
+import Data.List as L
+
+==>
+
+Program(Identifier,Identifier,⚠,Cast(LValue(Identifier),as,Type(Identifier)))
+
+# Qualified import with alias
+
+qualified import Data.List as L
+
+==>
+
+Program(Identifier,Identifier,Identifier,⚠,Cast(LValue(Identifier),as,Type(Identifier)))

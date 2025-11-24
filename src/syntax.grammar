@@ -1,4 +1,4 @@
-@top Program { expression* }
+@top Program { (Import | expression)* }
 
 @skip { space | LineComment | BlockComment }
 
@@ -9,13 +9,12 @@ parenthesized<content> { "(" content ")" }
 kw<term> { @specialize[@name={term}]<Identifier, term> }
 
 expression {
-  Identifier |
-  String |
-  Boolean |
-  Number |
-  DoBlock |
-  ParameterSection |
-  Cast |
+  Application |
+  BinaryOperation {
+    LValue
+    (ArithmeticOperator | ComparisonOperator | BooleanOperator | AssignmentOperator)
+    RValue
+  } |
   Definition {
     kw<"let"> LValue ParameterSection? ReturnValue? AssignmentOperator RValue
   } |
@@ -25,11 +24,24 @@ expression {
   Trait |
   Impl |
   HaskellStyle |
-  BinaryOperation {
-    LValue
-    (ArithmeticOperator | ComparisonOperator | BooleanOperator | AssignmentOperator)
-    RValue
-  }
+  Lambda |
+  Cast |
+  DoBlock |
+  ListLiteral |
+  BaseExpression
+}
+
+Application {
+  BaseExpression (BaseExpression | parenthesized<expression> | ListLiteral | String | Boolean | Number)+
+}
+
+BaseExpression {
+  parenthesized<expression> |
+  Identifier |
+  String |
+  Boolean |
+  Number |
+  ListLiteral
 }
 
 ReturnValue {
@@ -37,10 +49,14 @@ ReturnValue {
 }
 
 ParameterSection {
-  "(" commaSep<Parameter> ")"
+  "(" Parameter ("," Parameter)* ")" |
+  "(" ")"
 }
 
 Type {
+  GenericType {
+    Identifier "<" commaSep<Type> ">"
+  } |
   Identifier
 }
 
@@ -106,7 +122,7 @@ Struct {
 }
 
 isSection {
-    kw<"is"> commaSep1<Type>
+    kw<"is"> Type ("," Type)*
 }
 
 satisfiesSection {
@@ -129,6 +145,19 @@ Cast {
   LValue kw<"as"> Type
 }
 
+Lambda {
+  LambdaStart ParameterSection "->" expression |
+  LambdaStart Identifier "->" expression
+}
+
+ListLiteral {
+  "[" commaSep<expression> "]"
+}
+
+Import {
+  (kw<"qualified">)? kw<"import"> Identifier (kw<"as"> Identifier)?
+}
+
 @tokens {
   identifierChar { @asciiLetter | $[_$\u{a1}-\u{10ffff}] }
   word { identifierChar (identifierChar | @digit)* }
@@ -140,13 +169,14 @@ Cast {
   BlockComment { "/*" (![@*] | "*" ![@/])* "*/" }
   AssignmentOperator { "=" }
   ArithmeticOperator { "+" | "-" | "*" | "/" | "%" }
-  ComparisonOperator { "==" | "!=" | "<" | "<=" | ">" | ">=" }
+  ComparisonOperator { "==" | "!=" | "<=" | ">=" }
   BooleanOperator { "&&" | "||" }
   Number { $[0-9]+ }
+  LambdaStart { "\\" }
   space { $[ \t\n\r]+ }
 
-  "(" ")"
-  @precedence { ArithmeticOperator, ComparisonOperator, BooleanOperator, AssignmentOperator, Boolean, Identifier }
+  "(" ")" "[" "]" "<" ">"
+  @precedence { ArithmeticOperator, ComparisonOperator, BooleanOperator, AssignmentOperator, Boolean, Identifier, "<", ">" }
 }
 
 @detectDelim
