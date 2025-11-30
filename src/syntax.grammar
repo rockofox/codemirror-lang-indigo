@@ -3,13 +3,11 @@
 @skip { space | LineComment | BlockComment }
 
 commaSep<content> { "" | content ("," content)* }
-commaSep1<content> { content ("," content)* }
 arrowSep<content> { content ("->" content)* }
 parenthesized<content> { "(" content ")" }
 kw<term> { @specialize[@name={term}]<Identifier, term> }
 
 expression {
-  Application |
   BinaryOperation {
     LValue
     (ArithmeticOperator | ComparisonOperator | BooleanOperator | StringConcatOperator | AssignmentOperator)
@@ -20,8 +18,8 @@ expression {
   } |
   If |
   When |
-  Struct |
   ValueStruct |
+  Struct |
   Trait |
   Impl |
   External |
@@ -30,15 +28,11 @@ expression {
   Cast |
   DoBlock |
   StructInstantiation |
+  FieldAccess |
   BaseExpression
 }
 
-Application {
-  BaseExpression BaseExpression+
-}
-
 BaseExpression {
-  FieldAccess |
   parenthesized<expression> |
   Identifier |
   String |
@@ -59,7 +53,7 @@ ParameterSection {
 
 Type {
   ListType {
-    "List" "{" Type "}"
+    kw<"List"> "{" Type "}"
   } |
   GenericType {
     Identifier "<" commaSep<Type> ">"
@@ -124,16 +118,16 @@ CharListPattern {
 }
 
 @precedence { is @left, satisfies @left }
-Struct {
-    kw<"struct"> Identifier AssignmentOperator ParameterSection (!is isSection)? (!satisfies satisfiesSection)?
-}
-
 ValueStruct {
-    kw<"value"> kw<"struct"> Identifier AssignmentOperator ParameterSection (!is isSection)? (!satisfies satisfiesSection)?
+    kw<"value"> kw<"struct"> Identifier AssignmentOperator ParameterSection (!is isTypes)? (!satisfies satisfiesSection)?
 }
 
-isSection {
-    kw<"is"> Type ("," Type)*
+Struct {
+    kw<"struct"> Identifier AssignmentOperator ParameterSection (!is isTypes)? (!satisfies satisfiesSection)?
+}
+
+isTypes {
+    kw<"is"> Type
 }
 
 satisfiesSection {
@@ -195,17 +189,17 @@ Import {
   LineComment { "#" ![\n]* }
   BlockComment { "/*" (![@*] | "*" ![@/])* "*/" }
   AssignmentOperator { "=" }
+  StringConcatOperator { "++" }
   ArithmeticOperator { "+" | "-" | "*" | "/" | "%" }
   ComparisonOperator { "==" | "!=" | "<=" | ">=" | "<" | ">" }
   BooleanOperator { "&&" | "||" }
-  StringConcatOperator { "++" }
-  Number { $[0-9]+ }
   Float { $[0-9]+ "." $[0-9]+ }
+  Number { $[0-9]+ }
   LambdaStart { "\\" }
   space { $[ \t\n\r]+ }
 
   "(" ")" "[" "]" "<" ">" "{" "}" "." ":" "::" "->" "=>"
-  @precedence { ArithmeticOperator, ComparisonOperator, BooleanOperator, StringConcatOperator, AssignmentOperator, Boolean, Identifier, "<", ">" }
+  @precedence { Float, Number, StringConcatOperator, ArithmeticOperator, ComparisonOperator, BooleanOperator, AssignmentOperator, Boolean, Identifier, "<", ">" }
 }
 
 @detectDelim

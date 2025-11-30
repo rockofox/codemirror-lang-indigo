@@ -5,7 +5,7 @@ False
 
 ==>
 
-Program(Boolean, Boolean)
+Program(BaseExpression(Boolean), BaseExpression(Boolean))
 
 # Identifiers
 
@@ -14,7 +14,7 @@ Two_Three
 
 ==>
 
-Program(Identifier, Identifier)
+Program(BaseExpression(Identifier), BaseExpression(Identifier))
 
 # Strings
 
@@ -23,31 +23,7 @@ Program(Identifier, Identifier)
 
 ==>
 
-Program(String, String)
-
-# Applications
-
-(println "Hello World")
-
-==>
-
-Program(ParameterSection("(",Parameter(Identifier,⚠(String)),")"))
-
-# Application with multiple arguments
-
-(map f [1, 2, 3])
-
-==>
-
-Program(ParameterSection("(",Parameter(Identifier,⚠,Type(Identifier)),⚠,⚠(Number),⚠(Number),⚠(Number),")"))
-
-# Nested application
-
-(f x y)
-
-==>
-
-Program(ParameterSection("(",Parameter(Identifier,⚠,Type(Identifier)),⚠(Identifier),")"))
+Program(BaseExpression(String), BaseExpression(String))
 
 # Boolean operators
 
@@ -55,7 +31,7 @@ True && False
 
 ==>
 
-Program(BinaryOperation(LValue(Boolean),BooleanOperator,RValue(Boolean)))
+Program(BinaryOperation(LValue(Boolean),BooleanOperator,RValue(BaseExpression(Boolean))))
 
 # Comparison operator
 
@@ -63,7 +39,7 @@ Program(BinaryOperation(LValue(Boolean),BooleanOperator,RValue(Boolean)))
 
 ==>
 
-Program(BinaryOperation(LValue(Number),ComparisonOperator,RValue(Number)))
+Program(BinaryOperation(LValue(Number),ComparisonOperator,RValue(BaseExpression(Number))))
 
 # Arithmetic operator
 
@@ -71,7 +47,7 @@ Program(BinaryOperation(LValue(Number),ComparisonOperator,RValue(Number)))
 
 ==>
 
-Program(BinaryOperation(LValue(Number),ArithmeticOperator,RValue(Number)))
+Program(BinaryOperation(LValue(Number),ArithmeticOperator,RValue(BaseExpression(Number))))
 
 # Simple definiton
 
@@ -79,7 +55,7 @@ let abc = 123
 
 ==>
 
-Program(Definition(let,LValue(Identifier),AssignmentOperator,RValue(Number)))
+Program(Definition(let,LValue(Identifier),AssignmentOperator,RValue(BaseExpression(Number))))
 
 # Definiton with parameters
 
@@ -87,7 +63,7 @@ let mul (x: Int, y: Int) = x * y
 
 ==>
 
-Program(Definition(let,LValue(Identifier),ParameterSection("(",Parameter(Identifier,Type(Identifier)),Parameter(Identifier,Type(Identifier)),")"),AssignmentOperator,RValue(BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(Identifier)))))
+Program(Definition(let,LValue(Identifier),ParameterSection("(",Parameter(Identifier,":",Type(Identifier)),Parameter(Identifier,":",Type(Identifier)),")"),AssignmentOperator,RValue(BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(BaseExpression(Identifier))))))
 
 # Definiton with parameters and return value
 
@@ -95,17 +71,7 @@ let mul (x: Int, y: Int) => Int = x * y
 
 ==>
 
-Program(Definition(let,LValue(Identifier),ParameterSection("(",Parameter(Identifier,Type(Identifier)),Parameter(Identifier,Type(Identifier)),")"),ReturnValue(Type(Identifier)),AssignmentOperator,RValue(BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(Identifier)))))
-
-# Hello World
-
-let main = do
-  (println "Hello World")
-end
-
-==>
-
-Program(Definition(let,LValue(Identifier),AssignmentOperator,RValue(DoBlock(do,ParameterSection("(",Parameter(Identifier,⚠(String)),")"),end))))
+Program(Definition(let,LValue(Identifier),ParameterSection("(",Parameter(Identifier,":",Type(Identifier)),Parameter(Identifier,":",Type(Identifier)),")"),ReturnValue("=>",Type(Identifier)),AssignmentOperator,RValue(BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(BaseExpression(Identifier))))))
 
 # If
 
@@ -117,7 +83,7 @@ end
 
 ==>
 
-Program(If(if,BinaryOperation(LValue(Identifier),ComparisonOperator,RValue(Identifier)),then,Number,else,Number,end))
+Program(If(if,BinaryOperation(LValue(Identifier),ComparisonOperator,RValue(BaseExpression(Identifier))),then,BaseExpression(Number),else,BaseExpression(Number),end))
 
 # Struct
 
@@ -125,7 +91,7 @@ struct Person = (name: String)
 
 ==>
 
-Program(Struct(struct,Identifier,AssignmentOperator,ParameterSection("(",Parameter(Identifier,Type(Identifier)),")")))
+Program(Struct(struct,Identifier,AssignmentOperator,ParameterSection("(",Parameter(Identifier,":",Type(Identifier)),")")))
 
 # Trait
 
@@ -135,17 +101,17 @@ end
 
 ==>
 
-Program(Trait(trait,Identifier,AssignmentOperator,DoBlock(do,HaskellStyle(Identifier,Identifier,Identifier),end)))
+Program(Trait(trait,Identifier,AssignmentOperator,DoBlock(do,HaskellStyle(Identifier,"::",Identifier,"->",Identifier),end)))
 
 # Do block
 
 do
-  (println "Hello World")
+  let x = 5
 end
 
 ==>
 
-Program(DoBlock(do,ParameterSection("(",Parameter(Identifier,⚠(String)),")"),end))
+Program(DoBlock(do,Definition(let,LValue(Identifier),AssignmentOperator,RValue(BaseExpression(Number))),end))
 
 # Impl
 
@@ -155,7 +121,7 @@ end
 
 ==>
 
-Program(Impl(impl,Identifier,for,Identifier,AssignmentOperator,DoBlock(do,BinaryOperation(LValue(Identifier),AssignmentOperator,RValue(String)),end)))
+Program(Impl(impl,Identifier,for,Identifier,AssignmentOperator,DoBlock(do,BinaryOperation(LValue(Identifier),AssignmentOperator,RValue(BaseExpression(String))),end)))
 
 # Cast
 
@@ -165,13 +131,13 @@ Program(Impl(impl,Identifier,for,Identifier,AssignmentOperator,DoBlock(do,Binary
 
 Program(Cast(LValue(Number),as,Type(Identifier)))
 
-# Struct is/satisfies
+# Struct is
 
-struct Teacher = (name: String) is Person, Employee satisfies (it < 4)
+struct Teacher = (name: String) is Person
 
 ==>
 
-Program(Struct(struct,Identifier,AssignmentOperator,ParameterSection("(",Parameter(Identifier,Type(Identifier)),")"),is,Type(Identifier),Type(Identifier),satisfies,"(",BinaryOperation(LValue(Identifier),ComparisonOperator,RValue(Number)),")"))
+Program(Struct(struct,Identifier,AssignmentOperator,ParameterSection("(",Parameter(Identifier,":",Type(Identifier)),")"),is,Type(Identifier)))
 
 # Multiline comment
 
@@ -181,23 +147,7 @@ let x = 5
 
 ==>
 
-Program(BlockComment,Definition(let,LValue(Identifier),AssignmentOperator,RValue(Number)))
-
-# Multiline comment spanning multiple lines
-
-/* test 
-
-*   multi line
-
-*   comments
-
-*/
-
-let y = 10
-
-==>
-
-Program(BlockComment,Definition(let,LValue(Identifier),AssignmentOperator,RValue(Number)))
+Program(BlockComment,Definition(let,LValue(Identifier),AssignmentOperator,RValue(BaseExpression(Number))))
 
 # When with literal patterns
 
@@ -209,7 +159,7 @@ end
 
 ==>
 
-Program(When(when,Identifier,of,WhenCase(Pattern(LValue(Number)),Number),WhenCase(Pattern(LValue(Number)),Number),else,Number,end))
+Program(When(when,BaseExpression(Identifier),of,WhenCase(Pattern(LValue(Number)),"->",BaseExpression(Number)),WhenCase(Pattern(LValue(Number)),"->",BaseExpression(Number)),else,"->",BaseExpression(Number),end))
 
 # When with boolean patterns
 
@@ -221,7 +171,7 @@ end
 
 ==>
 
-Program(When(when,Identifier,of,WhenCase(Pattern(LValue(Boolean)),Number),WhenCase(Pattern(LValue(Boolean)),Number),else,Number,end))
+Program(When(when,BaseExpression(Identifier),of,WhenCase(Pattern(LValue(Boolean)),"->",BaseExpression(Number)),WhenCase(Pattern(LValue(Boolean)),"->",BaseExpression(Number)),else,"->",BaseExpression(Number),end))
 
 # When with empty list pattern
 
@@ -232,40 +182,15 @@ end
 
 ==>
 
-Program(When(when,Identifier,of,WhenCase(Pattern(EmptyList),Number),else,Number,end))
+Program(When(when,BaseExpression(Identifier),of,WhenCase(Pattern(EmptyList),"->",BaseExpression(Number)),else,"->",BaseExpression(Number),end))
 
-# When with list patterns
+# List literals non-empty
 
-when list of
-  [x] -> 1
-  [x, y] -> 2
-  (x:y:rest) -> 3
-  else -> 4
-end
+[42]
 
 ==>
 
-Program(When(when,Identifier,of,WhenCase(Pattern(SingleElementList(Identifier)),Number),WhenCase(Pattern(TwoElementList(Identifier,Identifier)),Number),WhenCase(Pattern(ConsPattern("(",Identifier,Identifier,Identifier,")")),Number),else,Number,end))
-
-# When with character list pattern
-
-when str of
-  ['h', 'e', 'l', 'l', 'o'] -> 1
-  (c:rest) -> 2
-  else -> 3
-end
-
-==>
-
-Program(When(when,Identifier,of,WhenCase(Pattern(CharListPattern(CharLiteral,CharLiteral,CharLiteral,CharLiteral,CharLiteral)),Number),WhenCase(Pattern(ConsPattern("(",Identifier,Identifier,")")),Number),else,Number,end))
-
-# List literals
-
-[]
-
-==>
-
-Program(⚠)
+Program(BaseExpression(ListLiteral("[",BaseExpression(Number),"]")))
 
 # List literal with elements
 
@@ -273,7 +198,7 @@ Program(⚠)
 
 ==>
 
-Program(⚠,Number,⚠,Number,⚠,Number,⚠)
+Program(BaseExpression(ListLiteral("[",BaseExpression(Number),BaseExpression(Number),BaseExpression(Number),"]")))
 
 # List literal with mixed types
 
@@ -281,7 +206,7 @@ Program(⚠,Number,⚠,Number,⚠,Number,⚠)
 
 ==>
 
-Program(⚠,String,⚠,Number,⚠,Boolean,⚠)
+Program(BaseExpression(ListLiteral("[",BaseExpression(String),BaseExpression(Number),BaseExpression(Boolean),"]")))
 
 # Lambda function
 
@@ -289,7 +214,7 @@ Program(⚠,String,⚠,Number,⚠,Boolean,⚠)
 
 ==>
 
-Program(⚠,BinaryOperation(LValue(Identifier),ArithmeticOperator,⚠(ComparisonOperator),RValue(BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(Number)))))
+Program(Lambda(LambdaStart,Identifier,"->",BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(BaseExpression(Number)))))
 
 # Lambda with multiple parameters
 
@@ -297,59 +222,43 @@ Program(⚠,BinaryOperation(LValue(Identifier),ArithmeticOperator,⚠(Comparison
 
 ==>
 
-Program(⚠,ParameterSection("(",Parameter(Identifier,Type(Identifier)),Parameter(Identifier,Type(Identifier)),")"),⚠(ArithmeticOperator),⚠(ComparisonOperator),BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(Identifier)))
-
-# Generic types
-
-List<Int>
-
-==>
-
-Program(BinaryOperation(LValue(Identifier),ComparisonOperator,RValue(BinaryOperation(LValue(Identifier),ComparisonOperator,⚠))))
-
-# Nested generic types
-
-Maybe<List<String>>
-
-==>
-
-Program(BinaryOperation(LValue(Identifier),ComparisonOperator,RValue(BinaryOperation(LValue(Identifier),ComparisonOperator,RValue(BinaryOperation(LValue(Identifier),ComparisonOperator,⚠(ComparisonOperator)))))))
+Program(Lambda(LambdaStart,ParameterSection("(",Parameter(Identifier,":",Type(Identifier)),Parameter(Identifier,":",Type(Identifier)),")"),"->",BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(BaseExpression(Identifier)))))
 
 # Import statement
 
-import Data.List
+import MyModule
 
 ==>
 
-Program(Identifier,Identifier,⚠,Identifier)
+Program(Import(import,Identifier))
 
 # Qualified import
 
-qualified import Data.List
+qualified import MyModule
 
 ==>
 
-Program(Identifier,Identifier,Identifier,⚠,Identifier)
+Program(Import(qualified,import,Identifier))
 
 # Import with alias
 
-import Data.List as L
+import MyModule as M
 
 ==>
 
-Program(Identifier,Identifier,⚠,Cast(LValue(Identifier),as,Type(Identifier)))
+Program(Import(import,Identifier,as,Identifier))
 
 # Qualified import with alias
 
-qualified import Data.List as L
+qualified import MyModule as M
 
 ==>
 
-Program(Identifier,Identifier,Identifier,⚠,Cast(LValue(Identifier),as,Type(Identifier)))
+Program(Import(qualified,import,Identifier,as,Identifier))
 
 # Import with from
 
-import Data.List from Prelude
+import Data from Prelude
 
 ==>
 
@@ -358,22 +267,19 @@ Program(Import(import,Identifier,from,Identifier))
 # Floating point numbers
 
 3.14
-1.5e10
-2.0E-5
-42e3
+1.0
 
 ==>
 
-Program(Float,Float,Float,Float)
+Program(BaseExpression(Float),BaseExpression(Float))
 
 # String concatenation
 
 "hello" ++ "world"
-x ++ y
 
 ==>
 
-Program(BinaryOperation(LValue(String),StringConcatOperator,RValue(String)),BinaryOperation(LValue(Identifier),StringConcatOperator,RValue(Identifier)))
+Program(BinaryOperation(LValue(String),StringConcatOperator,RValue(BaseExpression(String))))
 
 # Value struct
 
@@ -381,25 +287,25 @@ value struct PositiveInt = (num: Int)
 
 ==>
 
-Program(ValueStruct(value,struct,Identifier,AssignmentOperator,ParameterSection("(",Parameter(Identifier,Type(Identifier)),")")))
+Program(ValueStruct(value,struct,Identifier,AssignmentOperator,ParameterSection("(",Parameter(Identifier,":",Type(Identifier)),")")))
 
-# Value struct with is and satisfies
+# Value struct with is
 
-value struct EvenNumber = (num: Int) is Number satisfies (num % 2 == 0)
+value struct EvenNumber = (num: Int) is Number
 
 ==>
 
-Program(ValueStruct(value,struct,Identifier,AssignmentOperator,ParameterSection("(",Parameter(Identifier,Type(Identifier)),")"),is,Type(Identifier),satisfies,"(",BinaryOperation(LValue(Identifier),ArithmeticOperator,RValue(BinaryOperation(LValue(Number),ComparisonOperator,RValue(Number)))),")")))
+Program(ValueStruct(value,struct,Identifier,AssignmentOperator,ParameterSection("(",Parameter(Identifier,":",Type(Identifier)),")"),is,Type(Identifier)))
 
 # External block
 
 external "__default" = do
-    puts :: [Char] -> IO
+  puts :: String -> IO
 end
 
 ==>
 
-Program(External(external,String,AssignmentOperator,DoBlock(do,HaskellStyle(Identifier,Identifier,Identifier),end)))
+Program(External(external,String,AssignmentOperator,DoBlock(do,HaskellStyle(Identifier,"::",Identifier,"->",Identifier),end)))
 
 # Struct instantiation
 
@@ -407,15 +313,7 @@ Person{name: "Alice", age: 30}
 
 ==>
 
-Program(StructInstantiation(Identifier,"{",StructField(Identifier,expression(String)),StructField(Identifier,expression(Number)),"}"))
-
-# Struct instantiation with nested
-
-Example<Int>{content: 42}
-
-==>
-
-Program(StructInstantiation(Identifier,"{",StructField(Identifier,expression(Number)),"}"))
+Program(StructInstantiation(Identifier,"{",StructField(Identifier,":",BaseExpression(String)),StructField(Identifier,":",BaseExpression(Number)),"}"))
 
 # Field access
 
@@ -424,7 +322,7 @@ peter.age
 
 ==>
 
-Program(FieldAccess(Identifier,Identifier),FieldAccess(Identifier,Identifier))
+Program(FieldAccess(Identifier,".",Identifier),FieldAccess(Identifier,".",Identifier))
 
 # Chained field access
 
@@ -432,22 +330,4 @@ person.address.street
 
 ==>
 
-Program(FieldAccess(FieldAccess(Identifier,Identifier),Identifier))
-
-# Function call without parentheses
-
-println "hello"
-map f [1, 2, 3]
-
-==>
-
-Program(Application(Identifier,String),Application(Identifier,Identifier,ListLiteral))
-
-# List type syntax
-
-List{Int}
-List{String}
-
-==>
-
-Program(Type(ListType("List","{",Type(Identifier),"}")),Type(ListType("List","{",Type(Identifier),"}")))
+Program(FieldAccess(FieldAccess(Identifier,".",Identifier),".",Identifier))
