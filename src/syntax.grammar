@@ -12,7 +12,7 @@ expression {
   Application |
   BinaryOperation {
     LValue
-    (ArithmeticOperator | ComparisonOperator | BooleanOperator | AssignmentOperator)
+    (ArithmeticOperator | ComparisonOperator | BooleanOperator | StringConcatOperator | AssignmentOperator)
     RValue
   } |
   Definition {
@@ -21,26 +21,30 @@ expression {
   If |
   When |
   Struct |
+  ValueStruct |
   Trait |
   Impl |
+  External |
   HaskellStyle |
   Lambda |
   Cast |
   DoBlock |
-  ListLiteral |
+  StructInstantiation |
   BaseExpression
 }
 
 Application {
-  BaseExpression (BaseExpression | parenthesized<expression> | ListLiteral | String | Boolean | Number)+
+  BaseExpression BaseExpression+
 }
 
 BaseExpression {
+  FieldAccess |
   parenthesized<expression> |
   Identifier |
   String |
   Boolean |
   Number |
+  Float |
   ListLiteral
 }
 
@@ -54,6 +58,9 @@ ParameterSection {
 }
 
 Type {
+  ListType {
+    "List" "{" Type "}"
+  } |
   GenericType {
     Identifier "<" commaSep<Type> ">"
   } |
@@ -65,7 +72,7 @@ Parameter {
 }
 
 LValue {
-  Identifier | String | Boolean | Number
+  Identifier | String | Boolean | Number | Float | FieldAccess
 }
 
 RValue {
@@ -121,6 +128,10 @@ Struct {
     kw<"struct"> Identifier AssignmentOperator ParameterSection (!is isSection)? (!satisfies satisfiesSection)?
 }
 
+ValueStruct {
+    kw<"value"> kw<"struct"> Identifier AssignmentOperator ParameterSection (!is isSection)? (!satisfies satisfiesSection)?
+}
+
 isSection {
     kw<"is"> Type ("," Type)*
 }
@@ -135,6 +146,22 @@ Trait {
 
 Impl {
   kw<"impl"> Identifier kw<"for"> Identifier AssignmentOperator expression
+}
+
+External {
+  kw<"external"> String AssignmentOperator DoBlock
+}
+
+StructInstantiation {
+  Identifier "{" commaSep<StructField> "}"
+}
+
+StructField {
+  Identifier ":" expression
+}
+
+FieldAccess {
+  (Identifier | FieldAccess) "." Identifier
 }
 
 HaskellStyle {
@@ -155,7 +182,7 @@ ListLiteral {
 }
 
 Import {
-  (kw<"qualified">)? kw<"import"> Identifier (kw<"as"> Identifier)?
+  (kw<"qualified">)? kw<"import"> Identifier (kw<"from"> Identifier)? (kw<"as"> Identifier)?
 }
 
 @tokens {
@@ -169,14 +196,16 @@ Import {
   BlockComment { "/*" (![@*] | "*" ![@/])* "*/" }
   AssignmentOperator { "=" }
   ArithmeticOperator { "+" | "-" | "*" | "/" | "%" }
-  ComparisonOperator { "==" | "!=" | "<=" | ">=" }
+  ComparisonOperator { "==" | "!=" | "<=" | ">=" | "<" | ">" }
   BooleanOperator { "&&" | "||" }
+  StringConcatOperator { "++" }
   Number { $[0-9]+ }
+  Float { $[0-9]+ "." $[0-9]+ }
   LambdaStart { "\\" }
   space { $[ \t\n\r]+ }
 
-  "(" ")" "[" "]" "<" ">"
-  @precedence { ArithmeticOperator, ComparisonOperator, BooleanOperator, AssignmentOperator, Boolean, Identifier, "<", ">" }
+  "(" ")" "[" "]" "<" ">" "{" "}" "." ":" "::" "->" "=>"
+  @precedence { ArithmeticOperator, ComparisonOperator, BooleanOperator, StringConcatOperator, AssignmentOperator, Boolean, Identifier, "<", ">" }
 }
 
 @detectDelim
