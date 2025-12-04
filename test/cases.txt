@@ -230,7 +230,7 @@ import MyModule
 
 ==>
 
-Program(Import(import,Identifier))
+Program(Import(import,ImportPath(Identifier)))
 
 # Qualified import
 
@@ -238,7 +238,7 @@ qualified import MyModule
 
 ==>
 
-Program(Import(qualified,import,Identifier))
+Program(Import(qualified,import,ImportPath(Identifier)))
 
 # Import with alias
 
@@ -246,7 +246,7 @@ import MyModule as M
 
 ==>
 
-Program(Import(import,Identifier,as,Identifier))
+Program(Import(import,ImportPath(Identifier),as,Identifier))
 
 # Qualified import with alias
 
@@ -254,7 +254,7 @@ qualified import MyModule as M
 
 ==>
 
-Program(Import(qualified,import,Identifier,as,Identifier))
+Program(Import(qualified,import,ImportPath(Identifier),as,Identifier))
 
 # Import with from
 
@@ -262,7 +262,7 @@ import Data from Prelude
 
 ==>
 
-Program(Import(import,Identifier,from,Identifier))
+Program(Import(import,ImportPath(Identifier),from,ImportPath(Identifier)))
 
 # Floating point numbers
 
@@ -331,3 +331,14 @@ person.address.street
 ==>
 
 Program(FieldAccess(FieldAccess(Identifier,".",Identifier),".",Identifier))
+
+# Module declaration
+
+module MyModule
+
+let x = 5
+
+==>
+
+Program(Module(module,Identifier),Definition(let,LValue(Identifier),AssignmentOperator,RValue(BaseExpression(Number))))
+

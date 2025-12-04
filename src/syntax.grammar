@@ -1,4 +1,4 @@
-@top Program { (Import | expression)* }
+@top Program { Module? (Import | expression)* }
 
 @skip { space | LineComment | BlockComment }
 
@@ -175,8 +175,16 @@ ListLiteral {
   "[" commaSep<expression> "]"
 }
 
+Module {
+  kw<"module"> Identifier
+}
+
 Import {
-  (kw<"qualified">)? kw<"import"> Identifier (kw<"from"> Identifier)? (kw<"as"> Identifier)?
+  (kw<"qualified">)? kw<"import"> ImportPath (kw<"from"> ImportPath)? (kw<"as"> Identifier)?
+}
+
+ImportPath {
+  Identifier (("." | "/") Identifier)* | ("@" Identifier (("/" | ".") Identifier)*)
 }
 
 @tokens {
